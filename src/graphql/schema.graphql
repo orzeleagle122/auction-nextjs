@@ -1,0 +1,132 @@
+# This file was generated based on ".graphqlconfig". Do not edit manually.
+
+schema {
+    query: Query
+    mutation: Mutation
+    subscription: Subscription
+}
+
+type Auction {
+    " bidder role ID of the discord server"
+    bidderRoleId: String
+    " list of bidders / captains"
+    bidders: [Bidder]!
+    " channel ID of the discord channel"
+    channelId: String
+    " who created the auction"
+    createdBy: User!
+    " funds loss prevention percentage"
+    fundsLossPreventionPercentage: Int!
+    " guild ID of the discord server"
+    guildId: String
+    id: ID!
+    " initial balance"
+    initialBalance: Int!
+    " initial time for the auction"
+    initialTime: Int!
+    " maximum bid amount"
+    maximumBidAmount: Int!
+    " maximum team size"
+    maximumTeamSize: Int!
+    " minimum bid increment"
+    minimumBidIncrement: Int!
+    " minimum team size"
+    minimumTeamSize: Int!
+    " list of players to be auctioned"
+    players: [Player]!
+    " reset time for the auction (after a bid)"
+    resetTime: Int!
+    " when the auction can be started"
+    startsAt: String!
+    " current status of the auction"
+    status: AuctionStatus!
+    " title of the auction"
+    title: String!
+}
+
+type Bid {
+    amount: Int!
+    auctionId: ID!
+    bidder: Bidder
+    id: ID!
+    isOngoing: Boolean!
+    playerOsuId: Int!
+}
+
+type Bidder {
+    balance: Int!
+    id: ID!
+    user: User!
+}
+
+type Mutation {
+    " bid for the player"
+    bid(amount: Int!, auctionId: ID!): Bid!
+    createAuction(createAuction: CreateAuction!): Auction!
+    startAuction(auctionId: ID!): Auction!
+    stopAuction(auctionId: ID!): Auction
+    uploadPlayersData(auctionId: ID!, multipartFile: MultipartFile!): Auction!
+}
+
+type Player {
+    country: String!
+    osuId: Int!
+    qualifierRank: Int!
+    rank: Int!
+    username: String!
+}
+
+type Query {
+    getTestToken: String!
+    hello: String
+    " retrieve user information based on Bearer JWT"
+    me: User
+}
+
+type Role {
+    role: String!
+}
+
+type Subscription {
+    userEvent: User
+}
+
+type User {
+    active: Boolean!
+    id: ID!
+    osuId: Int!
+    roles: [Role]!
+    username: String!
+}
+
+enum AuctionStatus {
+    CREATED
+    FINISHED
+    PAUSED
+    STARTED
+    WAITING_TO_START
+}
+
+"Parseable DateTime scalar type, i.e.: 2021-01-01T12:00:00."
+scalar DateTime
+
+"Multipart file."
+scalar MultipartFile
+
+input CreateAuction {
+    " funds loss prevention percentage"
+    fundsLossPreventionPercentage: Int!
+    " initial amount of money to be put on the auction"
+    initialBalance: Int!
+    " initial time for the auction"
+    initialTime: Int!
+    " maximum bid amount"
+    maximumBidAmount: Int!
+    " minimum bid increment"
+    minimumBidIncrement: Int!
+    " reset time for the auction"
+    resetTime: Int!
+    " when the auction can be started"
+    startsAt: DateTime!
+    title: String!
+}

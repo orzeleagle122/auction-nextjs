@@ -2,10 +2,51 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from '@next/font/google'
 import styles from '@/styles/Home.module.css'
+import {useLazyQuery, useMutation} from "@apollo/client";
+import {GET_TEST_TOKEN_QUERY} from "@/graphql/query/getTestTokenQuery";
+import {ME_QUERY} from "@/graphql/query/meQuery";
+import React, {useState} from "react";
+import {UPLOAD_PLAYER_DATE_MUTATION} from "@/graphql/mutation/uploadPlayerDate";
 
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
+
+  const [getToken, {data, loading}] = useLazyQuery(GET_TEST_TOKEN_QUERY);
+  const [getUser, {data:userData, loading:userLoading}] = useLazyQuery(ME_QUERY);
+
+  const [uploadFile, {data:uploadData, loading:uploadLoading, error}] = useMutation(UPLOAD_PLAYER_DATE_MUTATION)
+
+
+  const handleGetToken = async () => {
+    const {data} = await getToken();
+    localStorage.setItem('auth-token', data.getTestToken);
+  }
+
+  const handleGetUser = async () => {
+    const {data}=await getUser();
+    console.log(data,"data");
+  }
+
+  const [file, setFile] = useState<File | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setFile(e.target.files[0]);
+    }
+  }
+
+  const handleUpload = () => {
+    const formData = new FormData();
+    if(!file) return;
+    formData.append('file', file);
+    // image formData to blob
+    // const blob = new Blob([file], {type: 'image/jpeg'});
+    console.log(formData.get('file'), "formData.get('file')");
+    uploadFile({variables: {auctionId: "641c8ad4cf00991e87eb31ba",multipartFile: formData.get('file')}})
+
+  }
+
   return (
     <>
       <Head>
@@ -15,6 +56,13 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
+        <button onClick={handleGetToken}>GET TOKEN</button>
+        <button onClick={handleGetUser}>GET ME USER</button>
+        upload file
+        <input type="file" onChange={handleFileChange}/>
+        <button onClick={handleUpload}>UPLOAD</button>
+
+
         <div className={styles.description}>
           <p>
             Get started by editing&nbsp;
